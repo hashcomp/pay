@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HashPay</title>
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=0;" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+	<script>
+		function updateBalance() {
+			var balance = parseInt(localStorage.getItem("balance"));
+			if (isNaN(balance)) {
+				balance = 0;
+				localStorage.setItem("balance", balance.toString());
+			}
+			var account = localStorage.getItem("account");
+			if (!account) {
+				account = generateAccount();
+				localStorage.setItem("account", account);
+			}
+			document.getElementById("balance").innerHTML = balance;
+			document.getElementById("account").innerHTML = account;
+		}
+
+		function generateAccount() {
+			var account = "";
+			var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			for (var i = 0; i < 10; i++) {
+				account += characters.charAt(Math.floor(Math.random() * characters.length));
+			}
+			return account;
+		}
+
+		function validateHashcash() {
+			var hashcash = document.getElementById("hashcash").value;
+			var balance = parseInt(localStorage.getItem("balance"));
+			if (isNaN(balance)) {
+				balance = 0;
+				localStorage.setItem("balance", balance.toString());
+			}
+			var account = localStorage.getItem("account");
+			if (!account) {
+				account = generateAccount();
+				localStorage.setItem("account", account);
+			}
+			var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
+			var matches = hashcash.match(regex);
+			if (!matches || matches.length != 6) {
+				alert("Invalid hashcash format.");
+				return;
+			}
+			var timestamp = parseInt(matches[1]);
+			var message = matches[2];
+			var recipient = matches[3];
+			var value = parseInt(matches[4]);
+			var nonce = parseInt(matches[5]);
+			var hashcashData = "1:" + timestamp + ":sha256:" + message + ":" + recipient + "::" + value + ":" + nonce;
+			var hash = CryptoJS.SHA256(hashcashData).toString();
+			if (hash.substr(0, 5) !== "00000") {
+				alert("Invalid hashcash nonce.");
+				return;
+			}
+			if (recipient !== account) {
+				alert("Invalid recipient account.");
+				return;
+			}
+
+			// Check if hashcash has already been redeemed
+			var redeemedHashes = localStorage.getItem("redeemedHashes");
+			if (redeemedHashes && redeemedHashes.indexOf(hashcash) !== -1) {
+				alert("This hashpay cash has already been redeemed.");
+				return;
+			}
+
+			// Add hashcash value to balance and save hashcash to redeemedHashes
+			balance += value;
+			localStorage.setItem("balance", balance.toString());
+			updateBalance();
+
+			if (!redeemedHashes) {
+				redeemedHashes = hashcash;
+			} else {
+				redeemedHashes += "|" + hashcash;
+			}
+			localStorage.setItem("redeemedHashes", redeemedHashes);
+			alert("HashPay Cash validated and " + value + " added to your balance.");
+		}
+
+		window.onload = function() {
+			updateBalance();
+		};
+	</script>
+</head>
+<body>
+	<p>Account number: <span id="account"></span></p>
+	<p>Balance: <b><span id="balance"></span></b></p>
+  <hr>
+	<form>
+		<label for="hashcash">HashPay Cash:</label>
+		<input type="text" id="hashcash" name="hashcash"><br>
+		<input type="button" onclick="validateHashcash()" value="Receive the HashPay Cash">
+	</form>
+</body>
+</html>
