@@ -92,7 +92,33 @@
 	</script>
 </head>
 <body>
-	<p>Account number: <span id="account"></span></p>
+	<p>Account number: <span id="account"></span> <button onclick="copyAccountNumber()">Copy</button></p>
+
+<!-- JavaScript function to copy the account number to the clipboard -->
+<script>
+  function copyAccountNumber() {
+    var accountNumber = document.getElementById("account").textContent;
+    
+    // Create a temporary input element to hold the account number
+    var tempInput = document.createElement("input");
+    tempInput.value = accountNumber;
+    
+    // Append the input element to the document
+    document.body.appendChild(tempInput);
+    
+    // Select the text in the input element
+    tempInput.select();
+    
+    // Copy the selected text to the clipboard
+    document.execCommand("copy");
+    
+    // Remove the temporary input element
+    document.body.removeChild(tempInput);
+    
+    // Provide feedback to the user
+    alert("Account number copied: " + accountNumber);
+  }
+</script>
 	<p>Balance: <b><span id="balance"></span></b></p>
   <hr>
 	<form>
