@@ -84,8 +84,9 @@ function generateHashcash() {
 
         function copyHashcash() {
             var hashcashResult = document.getElementById("hashcashResult");
+            var qrText = "https://ifxhashpay.github.io/newre.html?hashcash=" + hashcashResult.trim(); // Trim here as well
             var range = document.createRange();
-            range.selectNode(hashcashResult);
+            range.selectNode(qrText);
             window.getSelection().removeAllRanges();
             window.getSelection().addRange(range);
             document.execCommand("copy");
