@@ -6,6 +6,91 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="style.css">
+	<style>
+        body {
+            font-family: courier, serif;
+            text-align: center;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            background-color: white;
+            color: #fff;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+
+        .logo {
+            width: 100px;
+        }
+
+        #content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            margin: 20px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: rgba(206, 179, 255, 0.8);
+        }
+
+        .balance {
+            font-size: 2em;
+            margin: 20px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            font-size: 1.2em;
+            color: rgba(206, 179, 255, 0.8);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: rgba(206, 179, 255, 0.8);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        input[type="submit"]:hover {
+            background-color: ;
+        }
+
+        #footer {
+            background-color: white;
+            color: black;
+            padding: 10px;
+        }
+
+        .disclaimer {
+            font-size: 0.8em;
+            margin: 10px;
+        }
+    </style>
 	<script>
 		function updateBalance() {
 			var balance = parseInt(localStorage.getItem("balance"));
@@ -119,12 +204,8 @@
     alert("Account number copied: " + accountNumber);
   }
 </script>
-	<p>Balance: <b><span id="balance"></span></b></p>
-  <hr>
-	<form>
-		<label for="hashcash">HashPay Cash:</label>
-		<input type="text" id="hashcash" name="hashcash"><br>
-		<input type="button" onclick="validateHashcash()" value="Receive the HashPay Cash">
-	</form>
+	<div id="content">
+	<div class="balance">Ᵽ<b><span id="balance"></span></b></div>
+	</div>
 </body>
 </html>
