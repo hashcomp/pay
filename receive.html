@@ -180,10 +180,21 @@
         var historyItems = [];
 
         for (var i = 0; i < hashes.length; i++) {
-            historyItems.push("<li>" + hashes[i] + "</li>");
+            var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
+            var matches = hashes[i].match(regex);
+
+            if (matches && matches.length === 6) {
+                var value = parseInt(matches[4]);
+                var message = matches[2];
+                historyItems.push("<li>+" + value + " " + message + "</li>");
+            }
         }
 
-        historyList.innerHTML = historyItems.join("");
+        if (historyItems.length > 0) {
+            historyList.innerHTML = historyItems.join("");
+        } else {
+            historyList.innerHTML = "<li>No transaction history yet.</li>";
+        }
     } else {
         historyList.innerHTML = "<li>No transaction history yet.</li>";
     }
@@ -191,8 +202,9 @@
 
 window.onload = function() {
     updateBalance();
-    updateTransactionHistory(); // Add this line to update the transaction history on page load
+    updateTransactionHistory();
 };
+
 
 	</script>
 </head>
