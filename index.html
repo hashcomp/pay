@@ -6,105 +6,106 @@
 <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
 <link rel="stylesheet" type="text/css" href="style.css">
-<style>
-body {font-family: Arial;}
+  <style>
+  body {font-family: Arial;}
 
-.recessed-image {
-  box-shadow: 5px 5px 10px #888888;
-  display: inline-block;
-}
-.top {
--webkit-background-size: cover;
--moz-background-size: cover;
--o-background-size: cover;
-background-size: cover;
-}
-.bottom {
-  height: 50%;
-}
-/* Style the tab */
-.tab {
-  width: 97%
-  border: none
-  overflow: hidden;
-  background-color: #f1f1f1;
-}
+  .recessed-image {
+    box-shadow: 5px 5px 10px #888888;
+    display: inline-block;
+  }
+  .top {
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  }
+  .bottom {
+    height: 50%;
+  }
+  /* Style the tab */
+  .tab {
+    width: 97%
+    border: none
+    overflow: hidden;
+    background-color: #f1f1f1;
+  }
 
-/* Style the buttons inside the tab */
-.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
-  font-size: 17px;
-  width: 50%;
-}
+  /* Style the buttons inside the tab */
+  .tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+    width: 50%;
+  }
 
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #ddd;
-}
+  /* Change background color of buttons on hover */
+  .tab button:hover {
+    background-color: #ddd;
+  }
 
-/* Create an active/current tablink class */
-.tab button.active {
-  background-color: #ccc;
-}
+  /* Create an active/current tablink class */
+  .tab button.active {
+    background-color: #ccc;
+  }
 
-/* Style the tab content */
-.tabcontent {
-  height: 80vh;
-  padding: 2px 5px;
-  display: none;
-  border-top: none;
-  border: none
-}
-</style>
+  /* Style the tab content */
+  .tabcontent {
+    height: 80vh;
+    padding: 2px 5px;
+    display: none;
+    border-top: none;
+    border: none
+  }
+  </style>
 </head>
+<body>
 <div class="top">
   <table>
-  <tr>
-    <td>
-        <a href="index.html"><img width="50" height="50.4" src='hashpay.png' alt='hashpay' filter: drop-shadow(20px 20px 10px green);></a>
-    </td>
-    <td>
-    </td>
-  </tr>
-</table>
-
-</div>
-<body>
-<div class="tab">
-  <button class="tablinks" onclick="openCity(event, 'London')" id="defaultOpen">⬇️</button>
-  <button class="tablinks" onclick="openCity(event, 'baghdad')">⬆️</button>
+    <tr>
+      <td>
+        <a href="index.html"><img width="50" height="50.4" src="hashpay.png" alt="hashpay"></a>
+      </td>
+      <td>
+        <input type="password" id="passwordInput" placeholder="Enter Password">
+        <button onclick="setPassword()">Set/Update Password</button>
+      </td>
+    </tr>
+  </table>
 </div>
 
-<div id="London" class="tabcontent">
-  <iframe src="receive.html" title="feed" width="100%" height="100%" style="border: none"></iframe>
-</div>
+  <div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'London')" id="defaultOpen">⬇️</button>
+    <button class="tablinks" onclick="openCity(event, 'baghdad')">⬆️</button>
+  </div>
 
-<div id="Paris" class="tabcontent">
-  <iframe src="apps.html" title="feed" width="100%" height="100%" style="border: none"></iframe>
-</div>
+  <div id="London" class="tabcontent">
+    <iframe src="receive.html" title="feed" width="100%" height="100%" style="border: none"></iframe>
+  </div>
 
-<div id="ny" class="tabcontent">
-  <iframe src="dm.php" title="pay" width="100%" height="100%" style="border: none"></iframe>
-</div>
+  <div id="Paris" class="tabcontent">
+    <iframe src="apps.html" title="feed" width="100%" height="100%" style="border: none"></iframe>
+  </div>
 
-<div id="baghdad" class="tabcontent">
-  <iframe src="send.html" title="about" width="100%" height="100%" style="border: none"></iframe>
-</div>
+  <div id="ny" class="tabcontent">
+    <iframe src="dm.php" title="pay" width="100%" height="100%" style="border: none"></iframe>
+  </div>
 
-<div id="lol" class="tabcontent">
-  <iframe src="june.html" title="june" width="100%" height="100%" style="border: none"></iframe>
-</div>
+  <div id="baghdad" class="tabcontent">
+    <iframe src="send.html" title="about" width="100%" height="100%" style="border: none"></iframe>
+  </div>
 
-<div id="Tokyo" class="tabcontent">
-  <iframe src="profile.php" title="profile" width="100%" height="100%" style="border: none"></iframe>
-</div>
+  <div id="lol" class="tabcontent">
+    <iframe src="june.html" title="june" width="100%" height="100%" style="border: none"></iframe>
+  </div>
 
+  <div id="Tokyo" class="tabcontent">
+    <iframe src="profile.php" title="profile" width="100%" height="100%" style="border: none"></iframe>
+  </div>
 <script>
 function openCity(evt, cityName) {
   var i, tabcontent, tablinks;
@@ -116,8 +117,30 @@ function openCity(evt, cityName) {
   for (i = 0; i < tablinks.length; i++) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
-  document.getElementById(cityName).style.display = "block";
+
+  const storedPassword = localStorage.getItem("sitePassword");
+  if (!storedPassword) {
+    document.getElementById(cityName).style.display = "block";
+  } else {
+    const enteredPassword = prompt("Please enter the password:");
+    if (enteredPassword === storedPassword) {
+      document.getElementById(cityName).style.display = "block";
+    } else {
+      alert("Incorrect password. Access denied.");
+    }
+  }
+
   evt.currentTarget.className += " active";
+}
+
+function setPassword() {
+  const password = document.getElementById("passwordInput").value;
+  if (password) {
+    localStorage.setItem("sitePassword", password);
+    alert("Password set/updated successfully!");
+  } else {
+    alert("Please enter a valid password.");
+  }
 }
 
 // Get the element with id="defaultOpen" and click on it
