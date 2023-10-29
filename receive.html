@@ -90,6 +90,22 @@
             font-size: 0.8em;
             margin: 10px;
         }
+        #transaction-history {
+    max-width: 100%;
+    overflow: auto; /* Add this line to enable horizontal scrolling if needed */
+}
+
+#history-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#history-list li {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
     </style>
 	<script>
 		function updateBalance() {
