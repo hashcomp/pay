@@ -6,6 +6,8 @@
 <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
 <link rel="stylesheet" type="text/css" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
   <style>
   body {font-family: Arial;}
 
@@ -96,7 +98,108 @@
   </div>
 
   <div id="baghdad" class="tabcontent">
-    <iframe src="send.html" title="about" width="100%" height="100%" style="border: none"></iframe>
+    <body>
+        <p>Ᵽ<b><span id="balance"></span></b></p>
+        <hr>
+        <form>
+            <label for="message">Message:</label>
+            <input type="text" id="message" name="message"><br>
+
+            <label for="value">Value:</label>
+            <input type="number" id="value" name="value" min="1"><br>
+
+            <label for="recipient">Recipient account number:</label>
+            <input type="email" id="recipient" name="recipient"><br>
+
+            <input type="button" onclick="generateHashcash()" value="Generate HashPay Cash to send">
+        </form>
+        <p id="result">
+            Generated HashPay Cash: <span id="hashcashResult"></span>
+            <button id="copyButton" onclick="copyHashcash()">Copy</button>
+        </p>
+        <center>
+        <div id="qrcode"></div> <!-- Container for the QR code -->
+        </center>
+        <script>
+            function updateBalance() {
+                var balance = parseInt(localStorage.getItem("balance"));
+                if (isNaN(balance)) {
+                    balance = 0;
+                    localStorage.setItem("balance", balance.toString());
+                }
+                document.getElementById("balance").innerHTML = balance;
+            }
+
+    function generateHashcash() {
+        var message = document.getElementById("message").value;
+        var value = parseInt(document.getElementById("value").value);
+        var recipient = document.getElementById("recipient").value;
+
+        var balance = parseInt(localStorage.getItem("balance"));
+        if (isNaN(balance)) {
+            balance = 0;
+            localStorage.setItem("balance", balance.toString());
+        }
+        if (balance < value) {
+            alert("Insufficient balance. You need at least " + value + " to make this transaction.");
+            return;
+        }
+
+        balance -= value;
+        localStorage.setItem("balance", balance.toString());
+        updateBalance();
+
+        var hashcash = "1:" + Date.now() + ":sha256:" + message + ":" + recipient + "::" + value + ":";
+        var nonce = 0;
+        var hash = "";
+        while (!hash.startsWith("00000")) {
+            nonce++;
+            hash = CryptoJS.SHA256(hashcash + nonce.toString()).toString();
+        }
+
+        var hashcashResult = hashcash + nonce;
+        hashcashResult = hashcashResult.trim(); // Trim any leading/trailing spaces
+        document.getElementById("hashcashResult").textContent = hashcashResult.trim(); // Trim any leading/trailing spaces
+
+        // Generate QR code for the HashPay Cash result with the desired text prefix
+        var qrText = "https://ifxhashpay.github.io/newre.html?hashcash=" + hashcashResult.trim(); // Trim here as well
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            text: qrText,
+            width: 128,
+            height: 128,
+        });
+    }
+
+
+
+    function copyHashcash() {
+        var hashcashResult = document.getElementById("hashcashResult");
+        var copiedHashcash = hashcashResult.textContent;
+        var url = "https://ifxhashpay.github.io/newre.html?hashcash=" + copiedHashcash;
+
+        // Create a temporary text area to hold the full URL
+        var tempTextArea = document.createElement("textarea");
+        tempTextArea.value = url;
+
+        // Append the text area to the document
+        document.body.appendChild(tempTextArea);
+
+        // Select and copy the URL from the text area
+        tempTextArea.select();
+        document.execCommand("copy");
+
+        // Remove the temporary text area
+        document.body.removeChild(tempTextArea);
+
+        alert("HashPay copied now go send it: " + url);
+    }
+
+
+            window.onload = function () {
+                updateBalance();
+            };
+        </script>
+    </body>
   </div>
 
   <div id="lol" class="tabcontent">
