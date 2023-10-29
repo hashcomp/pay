@@ -82,17 +82,28 @@ function generateHashcash() {
 
 
 
-        function copyHashcash() {
-            var hashcashResult = document.getElementById("hashcashResult");
-            var qrText = "https://ifxhashpay.github.io/newre.html?hashcash=" + hashcashResult.trim(); // Trim here as well
-            var range = document.createRange();
-            range.selectNode(hashcashResult);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand("copy");
-            window.getSelection().removeAllRanges();
-            alert("HashPay Cash copied, Now go send it! " + hashcashResult.textContent);
-        }
+function copyHashcash() {
+    var hashcashResult = document.getElementById("hashcashResult");
+    var copiedHashcash = hashcashResult.textContent;
+    var url = "https://ifxhashpay.github.io/newre.html?hashcash=" + copiedHashcash;
+
+    // Create a temporary text area to hold the full URL
+    var tempTextArea = document.createElement("textarea");
+    tempTextArea.value = url;
+
+    // Append the text area to the document
+    document.body.appendChild(tempTextArea);
+
+    // Select and copy the URL from the text area
+    tempTextArea.select();
+    document.execCommand("copy");
+
+    // Remove the temporary text area
+    document.body.removeChild(tempTextArea);
+
+    alert("HashPay copied now go send it: " + url);
+}
+
 
         window.onload = function () {
             updateBalance();
