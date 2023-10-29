@@ -171,9 +171,29 @@
 			alert("HashPay Cash validated and " + value + " added to your balance.");
 		}
 
-		window.onload = function() {
-			updateBalance();
-		};
+		function updateTransactionHistory() {
+    var redeemedHashes = localStorage.getItem("redeemedHashes");
+    var historyList = document.getElementById("history-list");
+
+    if (redeemedHashes) {
+        var hashes = redeemedHashes.split("|");
+        var historyItems = [];
+
+        for (var i = 0; i < hashes.length; i++) {
+            historyItems.push("<li>" + hashes[i] + "</li>");
+        }
+
+        historyList.innerHTML = historyItems.join("");
+    } else {
+        historyList.innerHTML = "<li>No transaction history yet.</li>";
+    }
+}
+
+window.onload = function() {
+    updateBalance();
+    updateTransactionHistory(); // Add this line to update the transaction history on page load
+};
+
 	</script>
 </head>
 <body>
@@ -207,5 +227,12 @@
 	<div id="content">
 	<div class="balance">Ħ<b><span id="balance"></span></b></div>
 	</div>
+	<div id="transaction-history">
+    <h2>Transaction History</h2>
+    <ul id="history-list">
+        <!-- Transaction history will be displayed here -->
+    </ul>
+</div>
+
 </body>
 </html>
