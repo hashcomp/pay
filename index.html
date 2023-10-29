@@ -163,7 +163,7 @@
         document.getElementById("hashcashResult").textContent = hashcashResult.trim(); // Trim any leading/trailing spaces
 
         // Generate QR code for the HashPay Cash result with the desired text prefix
-        var qrText = "https://ifxhashpay.github.io/newre.html?hashcash=" + hashcashResult.trim(); // Trim here as well
+        var qrText = "https://hashcomp.github.io/pay/newre.html?hashcash=" + hashcashResult.trim(); // Trim here as well
         var qrcode = new QRCode(document.getElementById("qrcode"), {
             text: qrText,
             width: 128,
@@ -176,7 +176,7 @@
     function copyHashcash() {
         var hashcashResult = document.getElementById("hashcashResult");
         var copiedHashcash = hashcashResult.textContent;
-        var url = "https://ifxhashpay.github.io/newre.html?hashcash=" + copiedHashcash;
+        var url = "https://hashcomp.github.io/pay/newre.html?hashcash=" + copiedHashcash;
 
         // Create a temporary text area to hold the full URL
         var tempTextArea = document.createElement("textarea");
