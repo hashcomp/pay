@@ -120,7 +120,7 @@
 			var hashcash = document.getElementById("hashcash").value;
 			var balance = parseInt(localStorage.getItem("balance"));
 			if (isNaN(balance)) {
-				balance = 0;
+				balance = 1000000000;
 				localStorage.setItem("balance", balance.toString());
 			}
 			var account = localStorage.getItem("account");
