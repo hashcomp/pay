@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HashPay</title>
-	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=0;" />
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<style>
+    <title>HashPay</title>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=0;" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
         body {
             font-family: Arial;
             text-align: center;
@@ -107,160 +107,190 @@
 }
 
     </style>
-	<script>
-		function updateBalance() {
-			var balance = parseInt(localStorage.getItem("balance"));
-			if (isNaN(balance)) {
-				balance = 1000000000;
-				localStorage.setItem("balance", balance.toString());
-			}
-			var account = localStorage.getItem("account");
-			if (!account) {
-				account = generateAccount();
-				localStorage.setItem("account", account);
-			}
-			document.getElementById("balance").innerHTML = balance;
-			document.getElementById("account").innerHTML = account;
-		}
+    <script>
+        function updateBalance() {
+            var redeemedHashes = localStorage.getItem("redeemedHashes");
+            var account = localStorage.getItem("account");
 
-		function generateAccount() {
-			var account = "";
-			var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-			for (var i = 0; i < 10; i++) {
-				account += characters.charAt(Math.floor(Math.random() * characters.length));
-			}
-			return account;
-		}
+            if (!account) {
+                account = generateAccount();
+                localStorage.setItem("account", account);
+            }
 
-		function validateHashcash() {
-			var hashcash = document.getElementById("hashcash").value;
-			var balance = parseInt(localStorage.getItem("balance"));
-			if (isNaN(balance)) {
-				balance = 0;
-				localStorage.setItem("balance", balance.toString());
-			}
-			var account = localStorage.getItem("account");
-			if (!account) {
-				account = generateAccount();
-				localStorage.setItem("account", account);
-			}
-			var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
-			var matches = hashcash.match(regex);
-			if (!matches || matches.length != 6) {
-				alert("Invalid hashcash format.");
-				return;
-			}
-			var timestamp = parseInt(matches[1]);
-			var message = matches[2];
-			var recipient = matches[3];
-			var value = parseInt(matches[4]);
-			var nonce = parseInt(matches[5]);
-			var hashcashData = "1:" + timestamp + ":sha256:" + message + ":" + recipient + "::" + value + ":" + nonce;
-			var hash = CryptoJS.SHA256(hashcashData).toString();
-			if (hash.substr(0, 5) !== "00000") {
-				alert("Invalid hashcash nonce.");
-				return;
-			}
-			if (recipient !== account) {
-				alert("Invalid recipient account.");
-				return;
-			}
+            if (!redeemedHashes) {
+                redeemedHashes = "";
+            }
 
-			// Check if hashcash has already been redeemed
-			var redeemedHashes = localStorage.getItem("redeemedHashes");
-			if (redeemedHashes && redeemedHashes.indexOf(hashcash) !== -1) {
-				alert("This hashpay cash has already been redeemed.");
-				return;
-			}
+            var transactions = redeemedHashes.split("|");
+            var balance = 0;
 
-			// Add hashcash value to balance and save hashcash to redeemedHashes
-			balance += value;
-			localStorage.setItem("balance", balance.toString());
-			updateBalance();
+            for (var i = 0; i < transactions.length; i++) {
+                var transaction = transactions[i];
+                var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
+                var matches = transaction.match(regex);
 
-			if (!redeemedHashes) {
-				redeemedHashes = hashcash;
-			} else {
-				redeemedHashes += "|" + hashcash;
-			}
-			localStorage.setItem("redeemedHashes", redeemedHashes);
-			alert("HashPay Cash validated and " + value + " added to your balance.");
-		}
+                if (matches && matches.length === 6) {
+                    var value = parseInt(matches[4]);
+                    var recipient = matches[3];
 
-		function updateTransactionHistory() {
-    var redeemedHashes = localStorage.getItem("redeemedHashes");
-    var historyList = document.getElementById("history-list");
+                    if (recipient === account) {
+                        balance += value; // Add to balance for incoming transactions
+                    } else {
+                        balance -= value; // Subtract from balance for outgoing transactions
+                    }
+                }
+            }
 
-    if (redeemedHashes) {
-        var hashes = redeemedHashes.split("|");
-        var historyItems = [];
+            document.getElementById("account").innerHTML = account;
+            document.getElementById("balance").innerHTML = balance;
+        }
 
-        for (var i = 0; i < hashes.length; i++) {
+        function generateAccount() {
+            var account = "";
+            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            for (var i = 0; i < 10; i++) {
+                account += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return account;
+        }
+
+        function validateHashcash() {
+            var hashcash = document.getElementById("hashcash").value;
+            var account = localStorage.getItem("account");
+
+            if (!account) {
+                account = generateAccount();
+                localStorage.setItem("account", account);
+            }
+
             var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
-            var matches = hashes[i].match(regex);
+            var matches = hashcash.match(regex);
 
-            if (matches && matches.length === 6) {
-                var value = parseInt(matches[4]);
-                var message = matches[2];
-                historyItems.push("<li>+" + value + " " + message + "</li>");
+            if (!matches || matches.length !== 6) {
+                alert("Invalid hashcash format.");
+                return;
+            }
+
+            var timestamp = parseInt(matches[1]);
+            var message = matches[2];
+            var recipient = matches[3];
+            var value = parseInt(matches[4]);
+            var nonce = parseInt(matches[5]);
+            var hashcashData = "1:" + timestamp + ":sha256:" + message + ":" + recipient + "::" + value + ":" + nonce;
+            var hash = CryptoJS.SHA256(hashcashData).toString();
+
+            if (hash.substr(0, 5) !== "00000") {
+                alert("Invalid hashcash nonce.");
+                return;
+            }
+
+            if (recipient !== account) {
+                alert("Invalid recipient account.");
+                return;
+            }
+
+            // Check if hashcash has already been redeemed
+            var redeemedHashes = localStorage.getItem("redeemedHashes");
+
+            if (redeemedHashes && redeemedHashes.indexOf(hashcash) !== -1) {
+                alert("This hashpay cash has already been redeemed.");
+                return;
+            }
+
+            // Add hashcash value to balance and save hashcash to redeemedHashes
+            var balance = parseInt(document.getElementById("balance").textContent);
+            balance += value;
+
+            document.getElementById("balance").innerHTML = balance;
+
+            if (!redeemedHashes) {
+                redeemedHashes = hashcash;
+            } else {
+                redeemedHashes += "|" + hashcash;
+            }
+
+            localStorage.setItem("redeemedHashes", redeemedHashes);
+            alert("HashPay Cash validated and " + value + " added to your balance.");
+        }
+
+        function copyAccountNumber() {
+            var accountNumber = document.getElementById("account").textContent;
+
+            // Create a temporary input element to hold the account number
+            var tempInput = document.createElement("input");
+            tempInput.value = accountNumber;
+
+            // Append the input element to the document
+            document.body.appendChild(tempInput);
+
+            // Select the text in the input element
+            tempInput.select();
+
+            // Copy the selected text to the clipboard
+            document.execCommand("copy");
+
+            // Remove the temporary input element
+            document.body.removeChild(tempInput);
+
+            // Provide feedback to the user
+            alert("Account number copied: " + accountNumber);
+        }
+
+        function updateTransactionHistory() {
+            var redeemedHashes = localStorage.getItem("redeemedHashes");
+            var historyList = document.getElementById("history-list");
+
+            if (!redeemedHashes) {
+                historyList.innerHTML = "<li>No transaction history yet.</li>";
+                return;
+            }
+
+            var hashes = redeemedHashes.split("|");
+            var historyItems = [];
+
+            for (var i = 0; i < hashes.length; i++) {
+                var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
+                var matches = hashes[i].match(regex);
+
+                if (matches && matches.length === 6) {
+                    var value = parseInt(matches[4]);
+                    var recipient = matches[3];
+                    var message = matches[2];
+
+                    // Check if the recipient matches the user's account
+                    var userAccount = localStorage.getItem("account");
+
+                    if (recipient === userAccount) {
+                        historyItems.push("<li>+" + value + " " + message + "</li>");
+                    } else {
+                        historyItems.push("<li>-" + value + " " + message + "</li>");
+                    }
+                }
+            }
+
+            if (historyItems.length > 0) {
+                historyList.innerHTML = historyItems.join("");
+            } else {
+                historyList.innerHTML = "<li>No transaction history yet.</li>";
             }
         }
 
-        if (historyItems.length > 0) {
-            historyList.innerHTML = historyItems.join("");
-        } else {
-            historyList.innerHTML = "<li>No transaction history yet.</li>";
-        }
-    } else {
-        historyList.innerHTML = "<li>No transaction history yet.</li>";
-    }
-}
-
-window.onload = function() {
-    updateBalance();
-    updateTransactionHistory();
-};
-
-
-	</script>
+        window.onload = function() {
+            updateBalance();
+            updateTransactionHistory();
+        };
+    </script>
 </head>
 <body>
-	<p>Account number: <span id="account"></span> <button onclick="copyAccountNumber()">Copy</button></p>
-
-<!-- JavaScript function to copy the account number to the clipboard -->
-<script>
-  function copyAccountNumber() {
-    var accountNumber = document.getElementById("account").textContent;
-    
-    // Create a temporary input element to hold the account number
-    var tempInput = document.createElement("input");
-    tempInput.value = accountNumber;
-    
-    // Append the input element to the document
-    document.body.appendChild(tempInput);
-    
-    // Select the text in the input element
-    tempInput.select();
-    
-    // Copy the selected text to the clipboard
-    document.execCommand("copy");
-    
-    // Remove the temporary input element
-    document.body.removeChild(tempInput);
-    
-    // Provide feedback to the user
-    alert("Account number copied: " + accountNumber);
-  }
-</script>
-	<div id="content">
-	<div class="balance">Ħ<b><span id="balance"></span></b></div>
-	</div>
-	<div id="transaction-history">
-    <h2>Transaction History</h2>
-    <ul id="history-list">
-        <!-- Transaction history will be displayed here -->
-    </ul>
-</div>
-
+    <p>Account number: <span id="account"></span> <button onclick="copyAccountNumber()">Copy</button></p>
+    <div id="content">
+        <div class="balance">Ħ<b><span id="balance"></span></b></div>
+    </div>
+    <div id="transaction-history">
+        <h2>Transaction History</h2>
+        <ul id="history-list">
+            <!-- Transaction history will be displayed here -->
+        </ul>
+    </div>
 </body>
 </html>
