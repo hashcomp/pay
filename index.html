@@ -119,88 +119,142 @@
             <button id="copyButton" onclick="copyHashcash()">Copy</button>
         </p>
         <center>
-        <div id="qrcode"></div> <!-- Container for the QR code -->
+            <div id="qrcode"></div> <!-- Container for the QR code -->
         </center>
         <script>
             function updateBalance() {
-                var balance = parseInt(localStorage.getItem("balance"));
-                if (isNaN(balance)) {
-                    balance = 0;
-                    localStorage.setItem("balance", balance.toString());
+                var redeemedHashes = localStorage.getItem("redeemedHashes");
+                var account = localStorage.getItem("account");
+
+                if (!account) {
+                    account = generateAccount();
+                    localStorage.setItem("account", account);
                 }
+
+                if (!redeemedHashes) {
+                    redeemedHashes = "";
+                }
+
+                var transactions = redeemedHashes.split("|");
+                var balance = 0;
+
+                for (var i = 0; i < transactions.length; i++) {
+                    var transaction = transactions[i];
+                    var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
+                    var matches = transaction.match(regex);
+
+                    if (matches && matches.length === 6) {
+                        var value = parseInt(matches[4]);
+                        var recipient = matches[3];
+
+                        if (recipient === account) {
+                            balance += value; // Add to balance for incoming transactions
+                        } else {
+                            balance -= value; // Subtract from balance for outgoing transactions
+                        }
+                    }
+                }
+
                 document.getElementById("balance").innerHTML = balance;
             }
 
-    function generateHashcash() {
-        var message = document.getElementById("message").value;
-        var value = parseInt(document.getElementById("value").value);
-        var recipient = document.getElementById("recipient").value;
+          function generateHashcash() {
+              var message = document.getElementById("message").value;
+              var value = parseInt(document.getElementById("value").value);
+              var recipient = document.getElementById("recipient").value;
+              var account = localStorage.getItem("account");
 
-        var balance = parseInt(localStorage.getItem("balance"));
-        if (isNaN(balance)) {
-            balance = 0;
-            localStorage.setItem("balance", balance.toString());
-        }
-        if (balance < value) {
-            alert("Insufficient balance. You need at least " + value + " to make this transaction.");
-            return;
-        }
+              if (recipient === account) {
+                  alert("You cannot send money to yourself.");
+                  return;
+              }
 
-        balance -= value;
-        localStorage.setItem("balance", balance.toString());
-        updateBalance();
+              if (value > 1000) {
+                  alert("Transaction amount cannot exceed 1000.");
+                  return;
+              }
 
-        var hashcash = "1:" + Date.now() + ":sha256:" + message + ":" + recipient + "::" + value + ":";
-        var nonce = 0;
-        var hash = "";
-        while (!hash.startsWith("00000")) {
-            nonce++;
-            hash = CryptoJS.SHA256(hashcash + nonce.toString()).toString();
-        }
+              var balance = parseInt(document.getElementById("balance").textContent);
 
-        var hashcashResult = hashcash + nonce;
-        hashcashResult = hashcashResult.trim(); // Trim any leading/trailing spaces
-        document.getElementById("hashcashResult").textContent = hashcashResult.trim(); // Trim any leading/trailing spaces
+              if (isNaN(balance)) {
+                  balance = 0;
+              }
 
-        // Generate QR code for the HashPay Cash result with the desired text prefix
-        var qrText = "https://hashcomp.github.io/pay/newre.html?hashcash=" + hashcashResult.trim(); // Trim here as well
-        var qrcode = new QRCode(document.getElementById("qrcode"), {
-            text: qrText,
-            width: 128,
-            height: 128,
-        });
-    }
+              if (balance < value) {
+                  alert("Insufficient balance. You need at least " + value + " to make this transaction.");
+                  return;
+              }
+
+              balance -= value;
+
+              // Note: The balance is not saved to local storage here
+
+              var hashcash = "1:" + Date.now() + ":sha256:" + message + ":" + recipient + "::" + value + ":";
+              var nonce = 0;
+              var hash = "";
+
+              while (!hash.startsWith("00000")) {
+                  nonce++;
+                  hash = CryptoJS.SHA256(hashcash + nonce.toString()).toString();
+              }
+
+              var hashcashResult = hashcash + nonce;
+              hashcashResult = hashcashResult.trim(); // Trim any leading/trailing spaces
+              document.getElementById("hashcashResult").textContent = hashcashResult.trim(); // Trim here as well
+
+              // Retrieve existing redeemedHashes from local storage
+              var redeemedHashes = localStorage.getItem("redeemedHashes");
+
+              if (redeemedHashes) {
+                  // Append the new hashcashResult to the existing redeemedHashes with a "|"
+                  redeemedHashes += "|" + hashcashResult;
+              } else {
+                  // Create a new redeemedHashes variable if it doesn't exist
+                  redeemedHashes = hashcashResult;
+              }
+
+              // Save the combined redeemedHashes back to local storage
+              localStorage.setItem("redeemedHashes", redeemedHashes);
+
+              // Generate QR code for the HashPay Cash result with the desired text prefix
+              var qrText = "https://hashcomp.github.io/pay/newre.html?hashcash=" + hashcashResult.trim(); // Trim here as well
+              var qrcode = new QRCode(document.getElementById("qrcode"), {
+                  text: qrText,
+                  width: 128,
+                  height: 128,
+              });
+          }
 
 
 
-    function copyHashcash() {
-        var hashcashResult = document.getElementById("hashcashResult");
-        var copiedHashcash = hashcashResult.textContent;
-        var url = "https://hashcomp.github.io/pay/newre.html?hashcash=" + copiedHashcash;
+            function copyHashcash() {
+                var hashcashResult = document.getElementById("hashcashResult");
+                var copiedHashcash = hashcashResult.textContent;
+                var url = "https://hashcomp.github.io/pay/newre.html?hashcash=" + copiedHashcash;
 
-        // Create a temporary text area to hold the full URL
-        var tempTextArea = document.createElement("textarea");
-        tempTextArea.value = url;
+                // Create a temporary text area to hold the full URL
+                var tempTextArea = document.createElement("textarea");
+                tempTextArea.value = url;
 
-        // Append the text area to the document
-        document.body.appendChild(tempTextArea);
+                // Append the text area to the document
+                document.body.appendChild(tempTextArea);
 
-        // Select and copy the URL from the text area
-        tempTextArea.select();
-        document.execCommand("copy");
+                // Select and copy the URL from the text area
+                tempTextArea.select();
+                document.execCommand("copy");
 
-        // Remove the temporary text area
-        document.body.removeChild(tempTextArea);
+                // Remove the temporary text area
+                document.body.removeChild(tempTextArea);
 
-        alert("HashPay copied now go send it: " + url);
-    }
-
+                alert("HashPay copied now go send it: " + url);
+            }
 
             window.onload = function () {
                 updateBalance();
             };
         </script>
     </body>
+
   </div>
 
   <div id="lol" class="tabcontent">
