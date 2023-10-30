@@ -31,75 +31,80 @@
 			return account;
 		}
 
-		function validateHashcash(hashcash) {
-			var balance = parseInt(localStorage.getItem("balance"));
-			if (isNaN(balance)) {
-				balance = 0;
-				localStorage.setItem("balance", balance.toString());
-			}
-			var account = localStorage.getItem("account");
-			if (!account) {
-				account = generateAccount();
-				localStorage.setItem("account", account);
-			}
-			var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
-			var matches = hashcash.match(regex);
-			if (!matches || matches.length != 6) {
-				alert("Invalid HashPay Cash format.");
-				return;
-			}
-			var timestamp = parseInt(matches[1]);
-			var message = matches[2];
-			var recipient = matches[3];
-			var value = parseInt(matches[4]);
-			var nonce = parseInt(matches[5]);
-			var hashcashData = "1:" + timestamp + ":sha256:" + message + ":" + recipient + "::" + value + ":" + nonce;
-			var hash = CryptoJS.SHA256(hashcashData).toString();
-			if (hash.substr(0, 5) !== "00000") {
-				alert("Invalid HashPay Cash nonce.");
-				return;
-			}
-			if (recipient !== account) {
-				alert("Invalid recipient account.");
-				return;
-			}
+        function validateHashcash(hashcash) {
+            var balance = parseInt(localStorage.getItem("balance"));
+            if (isNaN(balance)) {
+                balance = 0;
+                localStorage.setItem("balance", balance.toString());
+            }
+            var account = localStorage.getItem("account");
+            if (!account) {
+                account = generateAccount();
+                localStorage.setItem("account", account);
+            }
+            var regex = /^1:(\d+):sha256:(.*):(.*)::(\d+):(\d+)$/;
+            var matches = hashcash.match(regex);
+            if (!matches || matches.length != 6) {
+                alert("Invalid HashPay Cash format.");
+                return;
+            }
+            var timestamp = parseInt(matches[1]);
+            var message = matches[2];
+            var recipient = matches[3];
+            var value = parseInt(matches[4]);
+            var nonce = parseInt(matches[5]);
+            var hashcashData = "1:" + timestamp + ":sha256:" + message + ":" + recipient + "::" + value + ":" + nonce;
+            var hash = CryptoJS.SHA256(hashcashData).toString();
+            if (hash.substr(0, 5) !== "00000") {
+                alert("Invalid HashPay Cash nonce.");
+                return;
+            }
+            if (recipient !== account) {
+                alert("Invalid recipient account.");
+                return;
+            }
 
-			// Check if HashPay Cash has already been redeemed
-			var redeemedHashes = localStorage.getItem("redeemedHashes");
-			if (redeemedHashes && redeemedHashes.indexOf(hashcash) !== -1) {
-				alert("This HashPay Cash has already been redeemed.");
-				return;
-			}
+            // Check if HashPay Cash has already been redeemed
+            var redeemedHashes = localStorage.getItem("redeemedHashes");
+            if (redeemedHashes && redeemedHashes.indexOf(hashcash) !== -1) {
+                alert("This HashPay Cash has already been redeemed.");
+                return;
+            }
 
-			// Add HashPay Cash value to balance and save it to redeemedHashes
-			balance += value;
-			localStorage.setItem("balance", balance.toString());
-			updateBalance();
+            if (value > 1000) {
+                alert("HashPay Cash value is too high to redeem (over 1000).");
+                return;
+            }
 
-			if (!redeemedHashes) {
-				redeemedHashes = hashcash;
-			} else {
-				redeemedHashes += "|" + hashcash;
-			}
-			localStorage.setItem("redeemedHashes", redeemedHashes);
-			alert("HashPay Cash validated and " + value + " added to your balance.");
-		}
+            // Add HashPay Cash value to balance and save it to redeemedHashes
+            balance += value;
+            localStorage.setItem("balance", balance.toString());
+            updateBalance();
 
-		window.onload = function() {
-			updateBalance();
-			const urlParams = new URLSearchParams(window.location.search);
-			const hashcashParam = urlParams.get("hashcash");
-			if (hashcashParam) {
-				validateHashcash(hashcashParam);
-			}
-		};
-	</script>
+            if (!redeemedHashes) {
+                redeemedHashes = hashcash;
+            } else {
+                redeemedHashes += "|" + hashcash;
+            }
+            localStorage.setItem("redeemedHashes", redeemedHashes);
+            alert("HashPay Cash validated and " + value + " added to your balance.");
+        }
+
+        window.onload = function() {
+            updateBalance();
+            const urlParams = new URLSearchParams(window.location.search);
+            const hashcashParam = urlParams.get("hashcash");
+            if (hashcashParam) {
+                validateHashcash(hashcashParam);
+            }
+        };
+    </script>
 </head>
 <body>
-	<h1>You Just found some HashPay Cash 💸💸💸💸🤑🤑🤑</h1>
+    <h1>You Just found some HashPay Cash 💸💸💸💸🤑🤑🤑</h1>
 
-  <p>Account number: <span id="account"></span></p>
+    <p>Account number: <span id="account"></span></p>
 
-  <p> Your balance now: <b><span id="balance"></span></b></p>
+    <p> Your balance now: <b><span id="balance"></span></b></p> Ignore this for now
 </body>
 </html>
